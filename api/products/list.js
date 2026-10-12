@@ -1,0 +1,4 @@
+import { db } from "hatchable";
+export const access="public";
+export const methods=["GET"];
+export default async function(req,res){const {rows}=await db.query("SELECT id,name,description,price,stock,category,sizes,colors,image_url,featured FROM products ORDER BY featured DESC, created_at DESC");for(const x of rows){try{const a=JSON.parse(x.image_url||"");if(Array.isArray(a))x.image_url=JSON.stringify(a.map(v=>v.startsWith("http")?"/api/products/image?key="+encodeURIComponent(new URL(v).pathname.split("/storage/")[1]||v):v));}catch(e){if(x.image_url&&x.image_url.startsWith("http")){try{x.image_url=JSON.stringify(["/api/products/image?key="+encodeURIComponent(new URL(x.image_url).pathname.split("/storage/")[1]||x.image_url)])}catch(_){}}}}res.json(rows)}
