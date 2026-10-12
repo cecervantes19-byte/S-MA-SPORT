@@ -1,0 +1,4 @@
+import { db } from "hatchable";
+export const access="admin";
+export const methods=["POST"];
+export default async function(req,res){const b=req.body||{}; if(!b.name) return res.status(400).json({error:"El nombre es obligatorio"}); if(b.id){const {rows}=await db.query("UPDATE products SET name=$1,description=$2,price=$3,stock=$4,category=$5,sizes=$6,colors=$7,image_url=$8,featured=$9,updated_at=now() WHERE id=$10 RETURNING *",[b.name,b.description||"",Number(b.price)||0,Math.max(0,Number(b.stock)||0),b.category||"Ropa deportiva",b.sizes||"",b.colors||"",b.image_url||"",!!b.featured,b.id]);return res.json(rows[0])} const {rows}=await db.query("INSERT INTO products (name,description,price,stock,category,sizes,colors,image_url,featured) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",[b.name,b.description||"",Number(b.price)||0,Math.max(0,Number(b.stock)||0),b.category||"Ropa deportiva",b.sizes||"",b.colors||"",b.image_url||"",!!b.featured]);res.json(rows[0])}
